@@ -1,0 +1,32 @@
+name: Autograding Tests
+'on':
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Lesson_1_test
+      id: lesson_1_test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Lesson_1_test
+        setup-command: ''
+        command: python3 main.py
+        input: 2+4
+        expected-output: '6'
+        comparison-method: exact
+        timeout: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        LESSON_1_TEST_RESULTS: "${{steps.lesson_1_test.outputs.result}}"
+      with:
+        runners: lesson_1_test
